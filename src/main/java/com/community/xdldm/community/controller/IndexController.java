@@ -1,4 +1,4 @@
-package com.community.xdldm.community.Controller;
+package com.community.xdldm.community.controller;
 
 
 import org.springframework.stereotype.Controller;
