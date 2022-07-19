@@ -20,7 +20,7 @@ import java.util.UUID;
 public class AuthorizeController {
 
     @Autowired
-    private GithubProvider githubProvider;
+    private GithubProvider githubProvider;//包含token
 
     @Value("${github.client.id}")
     String clientId;
@@ -30,20 +30,20 @@ public class AuthorizeController {
     String redirectUri;
 
     @Autowired
-    private UserMapper userMapper;
+    private UserMapper userMapper;//调用方法对数据库进行数据增删改查
 
     @GetMapping("callback")
     public String callback(@RequestParam(name = "code") String code,
                            @RequestParam(name = "state") String state,
                            HttpServletResponse response){
-        AccessTokenDto accessTokenDto = new AccessTokenDto();
+        AccessTokenDto accessTokenDto = new AccessTokenDto();//获取token所需要的信息
         accessTokenDto.setClient_secret(clientSecret);
         accessTokenDto.setClient_id(clientId);
         accessTokenDto.setCode(code);
         accessTokenDto.setRedirect_uri(redirectUri);
         accessTokenDto.setState(state);
-        String accessToken = githubProvider.getAccessToken(accessTokenDto);
-        GithubUser githubUser = githubProvider.getUser(accessToken);
+        String accessToken = githubProvider.getAccessToken(accessTokenDto);//获取token
+        GithubUser githubUser = githubProvider.getUser(accessToken);//获取用户信息
         if (githubUser.getId()!=null) {
             //获取到用户信息
             User user = new User();
@@ -51,10 +51,10 @@ public class AuthorizeController {
             user.setName(githubUser.getName());
             user.setGmtCreate(System.currentTimeMillis());
             user.setGmtModified(user.getGmtCreate());
-            String token = UUID.randomUUID().toString();
+            String token = UUID.randomUUID().toString();//随机生成一个token保持登录状态
             user.setToken(token);
-            userMapper.insert(user);
-            response.addCookie(new Cookie("token", token));
+            userMapper.insert(user);//把用户信息写入数据库
+            response.addCookie(new Cookie("token", token));//向浏览器添加cookie
         }else{
             //未获取到用户信息
         }

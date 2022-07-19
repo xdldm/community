@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 
 @Controller
 public class IndexController {
@@ -22,9 +23,9 @@ public class IndexController {
             for (Cookie cookie : cookies) {
                 if (cookie.getName().equals("token")) {
                     String token = cookie.getValue();
-                    User user = userMapper.findByToken(token);
+                    User user = userMapper.findByToken(token);//根据token寻找用户判断是否已经登录
                     if (user!= null) {
-                        request.getSession().setAttribute("user", user);
+                        request.getSession().setAttribute("user", user);//把user写入session
                     }
                     break;
                 }
